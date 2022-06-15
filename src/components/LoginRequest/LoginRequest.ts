@@ -1,3 +1,5 @@
+import React from "react";
+
 type UserData = {
   username: string;
   password: string;
@@ -10,9 +12,11 @@ export const mockedUser: UserData = {
 
 export function LoginRequest(
   userName: string,
-  userPass: string
+  userPass: string,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<{ status: string }> {
   return new Promise((resolve, reject) => {
+    setLoading(true);
     setTimeout(() => {
       if (
         mockedUser.username === userName &&

@@ -4,6 +4,7 @@ import { mockedUser } from "../LoginRequest/LoginRequest";
 import Message from "../Message/Message";
 import Tiles from "../Tiles/Tiles";
 import "./loginForm.scss";
+import LoadingIcon from "../LoadingIcon/LoadingIcon";
 
 const LoginForm = () => {
   type InitialStateValue = {
@@ -20,6 +21,7 @@ const LoginForm = () => {
   const [inputsValue, SetInputsValue] = useState(initialStateValue);
   const [message, setMessage] = useState<string>("");
   const [isLoggedIn, SetIsLoggedIn] = useState<boolean>(false);
+  const [isLoading, SetIsLoading] = useState<boolean>(false);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,26 +29,25 @@ const LoginForm = () => {
       try {
         const result = await LoginRequest(
           inputsValue.user,
-          inputsValue.password
+          inputsValue.password,
+          SetIsLoading
         );
         if (result.status === "success") {
           SetIsSubmited(true);
+          SetIsLoading(false);
         }
       } catch (err) {
         SetIsSubmited(false);
+        SetIsLoading(false);
+        if (
+          mockedUser.password !== inputsValue.password ||
+          mockedUser.username !== inputsValue.user
+        ) {
+          setMessage("invalid password or username");
+        }
       }
     }
     asyncFunctionRequest();
-
-    if (mockedUser.password && mockedUser.username) {
-      setMessage("");
-      if (
-        mockedUser.password !== inputsValue.password ||
-        mockedUser.username !== inputsValue.user
-      ) {
-        setMessage("invalid password or username");
-      }
-    }
   };
 
   const handleLogout = () => {
@@ -56,6 +57,7 @@ const LoginForm = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+    setMessage("");
     SetInputsValue({
       ...inputsValue,
       [event.target.name]: value,
@@ -88,6 +90,7 @@ const LoginForm = () => {
             </div>
           </form>
           <Message message={message} />
+          {isLoading && <LoadingIcon />}
         </>
       ) : (
         <>
